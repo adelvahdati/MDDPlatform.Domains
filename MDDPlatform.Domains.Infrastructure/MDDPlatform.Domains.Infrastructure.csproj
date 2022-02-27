@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MDDPlatform.Domains.Application\MDDPlatform.Domains.Application.csproj" />
+    <ProjectReference Include="..\..\MDDPlatform.Messages\MDDPlatform.Messages.Broker\MDDPlatform.Messages.Broker.csproj" />
+    <ProjectReference Include="..\..\MDDPlatform.DataStorage\MDDPlatform.DataStorage.SQLDB\MDDPlatform.DataStorage.SQLDB.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
