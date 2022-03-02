@@ -50,11 +50,18 @@ namespace MDDPlatform.Domains.Infrastructure.Data.Migrations
                     b.Property<Guid>("DomainId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

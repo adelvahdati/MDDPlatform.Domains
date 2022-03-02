@@ -40,8 +40,9 @@ namespace MDDPlatform.Domains.Infrastructure{
 
             services.AddScoped<IQueryHandler<GetAllModels,IList<ModelDto>>,GetAllModelsHandler>();
             services.AddScoped<IQueryHandler<GetDomain, DomainDto>,GetDomainHandler>();
-            services.AddScoped<IQueryHandler<GetModel, ModelDto>,GetModelHandler>();
-            services.AddScoped<IQueryHandler<GetModelsByName, IList<ModelDto>>,GetModelByIdHandler>();
+            services.AddScoped<IQueryHandler<FindModel, ModelDto>,FindModelHandler>();
+            services.AddScoped<IQueryHandler<GetModelsByName, IList<ModelDto>>,GetModelsByNameHandler>();
+            services.AddScoped<IQueryHandler<GetModelsAtSpecificLevel, IList<ModelDto>>,GetModelsAtSpecificLevelHandler>();
 
             services.AddScoped<ICommandHandler<CreateModel>,CreateModelHandler>();
 

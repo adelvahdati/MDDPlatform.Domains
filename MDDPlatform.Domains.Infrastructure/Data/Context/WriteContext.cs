@@ -17,7 +17,7 @@ namespace MDDPlatform.Domains.Infrastructure.Data.Context
         {
             var configuration = new WriteContextConfiguration();
             modelBuilder.ApplyConfiguration<Domain>(configuration);
-            modelBuilder.ApplyConfiguration<DomainModel>(configuration);
+            modelBuilder.ApplyConfiguration<Model>(configuration);
 
         }
 

@@ -1,3 +1,5 @@
+using MDDPlatform.DomainModels.Core.Enums;
+using MDDPlatform.DomainModels.Core.ValueObjects;
 using MDDPlatform.Domains.Core.Events;
 using MDDPlatform.Domains.Core.ValueObjects;
 using MDDPlatform.SharedKernel.ActionResults;
@@ -7,38 +9,39 @@ namespace MDDPlatform.Domains.Core.Entities
 {
     public class Domain : BaseAggregate<Guid>
     {
-        private List<DomainModel> _domainModels = new List<DomainModel>();
+        private List<Model> _models = new List<Model>();
+
         public string Name { get; private set; }
         public ProblemDomain ProblemDomain { get; private set; }
-        public IReadOnlyList<DomainModel> DomainModels => _domainModels;
+        public IReadOnlyList<Model> Models => _models;
+
         private Domain()
         {
 
         }
-        private Domain(ProblemDomain problemDomain, Guid domainId, string name, List<DomainModel>? domainModels = null)
+        private Domain(ProblemDomain problemDomain, Guid domainId, string name, List<Model>? domainModels = null)
         {
             ProblemDomain = problemDomain;
             Id = domainId;
             Name = name;
             if (domainModels == null)
-                _domainModels = new List<DomainModel>();
+                _models = new List<Model>();
             else
-                _domainModels = domainModels;
+                _models = domainModels;
         }
-        public static Domain Create(ProblemDomain problemDomain, string name)
+        public static Domain Create(ProblemDomain problemDomain, Guid domainId, string name)
         {
             if(string.IsNullOrEmpty(name))
                 throw new DomainNameNullException("Domain name should not be null");
-
-            Guid domainId = Guid.NewGuid();
+            
             Domain domain = new Domain(problemDomain,domainId,name);
             domain.AddEvent(new DomainCreated(problemDomain.Id,domainId,name));
             return domain;
         }
-        public IActionStatus CreateModel(string name,string tag)
+        public IActionStatus CreateModel(string name,string tag,ModelAbstractions abstraction,int level)
         {
-            DomainModel? model;
-            var action = DomainModel.Create(name,tag);
+            Model? model;
+            var action = Model.Create(name,tag,abstraction,level);
             if(action.Status == ActionStatus.Failure)
                 return TheAction.Failed(action.Message);
                                     
@@ -50,48 +53,57 @@ namespace MDDPlatform.Domains.Core.Entities
                 return TheAction.Failed(ex.Message);;
             }
 
-            ISet<DomainModel> domainModelSet = new HashSet<DomainModel>(_domainModels);
             if (Equals(model, null))
                 return TheAction.Failed("Model Creation failed : model is null");
 
+            ISet<Model> domainModelSet = new HashSet<Model>(_models);
             if (domainModelSet.Add(model))
             {
-                _domainModels.Add(model);
+                _models.Add(model);
                 AddEvent(new ModelCreated(Id,model));
                 return TheAction.IsDone("Domain model ctreated");
             }
             return TheAction.Failed("Model Creation failed : model with this name and tag exist");
         }
-        public IActionResult<DomainModel> GetModel(string name, string tag)
+        public IActionResult<Model> GetModel(string name, string tag, ModelAbstractions abstraction,int level)
         {
             try
             {
-                var model = _domainModels.Where(dm => dm.Name == name && dm.Tag == tag).FirstOrDefault();
+                var type = ModelType.Create(abstraction);
+                var model = _models.Where(dm => dm.Name == name && 
+                                                dm.Tag == tag && 
+                                                dm.Type == type && 
+                                                dm.Level == level)
+                                    .FirstOrDefault();
 
                 if (Equals(model, null))
-                    return TheAction.Failed<DomainModel>("There is no model");
+                    return TheAction.Failed<Model>("There is no model");
 
-                return TheAction.IsDone<DomainModel>(model);
+                return TheAction.IsDone<Model>(model);
             }
             catch (Exception ex)
             {
-                return TheAction.Failed<DomainModel>(ex.Message);
+                return TheAction.Failed<Model>(ex.Message);
             }
         }
 
-        public IActionResult<IList<DomainModel>> GetModel(string name)
+        public IActionResult<IList<Model>> GetModel(string name,ModelAbstractions abstraction,int level)
         {
             try
             {
-                var models = _domainModels.Where(dm => dm.Name==name).ToList();
+                var type = ModelType.Create(abstraction);
+                var models = _models.Where(dm => dm.Name==name && 
+                                                dm.Type == type && 
+                                                dm.Level==level)
+                                    .ToList();
                 if (models.Count == 0)
-                    return TheAction.Failed<IList<DomainModel>>("There is no model");
+                    return TheAction.Failed<IList<Model>>("There is no model");
 
-                return TheAction.IsDone<IList<DomainModel>>(models);
+                return TheAction.IsDone<IList<Model>>(models);
             }
             catch (Exception ex)
             {
-                return TheAction.Failed<IList<DomainModel>>(ex.Message);
+                return TheAction.Failed<IList<Model>>(ex.Message);
             }
         }
 

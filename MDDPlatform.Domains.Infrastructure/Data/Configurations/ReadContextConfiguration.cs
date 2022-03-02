@@ -23,9 +23,11 @@ namespace MDDPlatform.Domains.Infrastructure.Data.Configurations
 
         public void Configure(EntityTypeBuilder<DomainModelData> builder)
         {
-            builder.Property<Guid>("Id");
+            builder.Property(dm=>dm.Id);
             builder.Property(dm=>dm.Name);
             builder.Property(dm=>dm.Tag);
+            builder.Property(dm=>dm.Type);
+            builder.Property(dm=>dm.Level);
 
             builder.HasOne(dm=>dm.Domain)
                     .WithMany(d=>d.DomainModels);

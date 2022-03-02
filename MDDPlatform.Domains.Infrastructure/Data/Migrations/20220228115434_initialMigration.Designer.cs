@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MDDPlatform.Domains.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ReadContext))]
-    [Migration("20220222201548_initialMigration")]
+    [Migration("20220228115434_initialMigration")]
     partial class initialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,11 +52,18 @@ namespace MDDPlatform.Domains.Infrastructure.Data.Migrations
                     b.Property<Guid>("DomainId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tag")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

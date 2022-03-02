@@ -3,7 +3,6 @@ using MDDPlatform.Domains.Services.Repositories;
 using MDDPlatform.Messages.Brokers;
 using MDDPlatform.Messages.Commands;
 using MDDPlatform.SharedKernel.ActionResults;
-using MDDPlatform.SharedKernel.Events;
 using MDDPlatform.SharedKernel.Mappers;
 
 namespace MDDPlatform.Domains.Services.Commands.Handlers
@@ -28,7 +27,7 @@ namespace MDDPlatform.Domains.Services.Commands.Handlers
         public async Task HandleAsync(CreateModel command)
         {
             Domain domain = await _domainWriter.GetAsync(command.DomainId);
-            var action = domain.CreateModel(command.Name,command.Tag);
+            var action = domain.CreateModel(command.Name,command.Tag,command.Abstraction,command.Level);
             if(action.Status == ActionStatus.Failure)
             {
                 Console.WriteLine("---> CreateModelHandler : " + action.Message);

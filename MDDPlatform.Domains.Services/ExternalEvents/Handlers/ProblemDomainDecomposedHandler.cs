@@ -27,6 +27,7 @@ namespace MDDPlatform.Domains.Services.ExternalEvents.Handlers
         {
             var domainName = @event.SubDomain;
             var problemDomainId = @event.ProblemDomainId;
+            var domainId = @event.SubDomainId;
 
             Console.WriteLine($"Inside ProblemDomainDecomposedHandler - Domain name : {domainName}, problemId {problemDomainId}");
 
@@ -39,7 +40,7 @@ namespace MDDPlatform.Domains.Services.ExternalEvents.Handlers
             }
             
             ProblemDomain problemDomain = new ProblemDomain(problemDomainId);            
-            Domain domain = Domain.Create(problemDomain,domainName);
+            Domain domain = Domain.Create(problemDomain,domainId,domainName);
             await _domainWriter.CreateAsync(domain);
             
             await _messageBroker.PublishAsync(_eventMapper.Map(domain.DomainEvents.ToList()));
