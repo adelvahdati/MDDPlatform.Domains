@@ -10,13 +10,17 @@ namespace MDDPlatform.Domains.Services.Commands
         public string Tag { get;}
         public ModelAbstractions Abstraction {get;}
         public int Level {get;}
-        public CreateModel(Guid domainId, string name, string tag,ModelAbstractions abstraction,int level)
+        public Guid LanguageId {get;}
+        public string LanguageName {get;}
+        public CreateModel(Guid domainId, string name, string tag,ModelAbstractions abstraction,int level,Guid languageId,string languageName)
         {
             DomainId = domainId;
             Name = name;
             Tag = tag;
             Abstraction =abstraction;
             Level = level;
+            LanguageId = languageId;
+            LanguageName = languageName;
         }
     }
 }

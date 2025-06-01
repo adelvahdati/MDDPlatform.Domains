@@ -1,9 +1,5 @@
-using System.Reflection;
-using MDDPlatform.Domains.Api;
+using MDDPlatform.Domains.Api.Middlewares;
 using MDDPlatform.Domains.Infrastructure;
-using MDDPlatform.Messages.Commands;
-using MDDPlatform.Messages.Events;
-using MDDPlatform.Messages.Queries;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +12,18 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Add CORS
+builder.Services.AddCors(options=>{
+    options.AddPolicy("APIClient",policy=>{
+        policy.WithOrigins("http://localhost:6094","https://localhost:7021")
+                .AllowAnyHeader()
+                .AllowAnyMethod();                
+    });
+});
+
+
 var app = builder.Build();
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -25,15 +32,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+
 app.UseRouting();
+app.UseCors("APIClient");
+
+app.UseAuthorization();
+
 app.UseEndpoints(endpoint =>{
     endpoint.MapGet("/", () => {                        
         return "MDDPlatform.Domains is running";
     } );
 });
-
-app.UseAuthorization();
 
 app.MapControllers();
 

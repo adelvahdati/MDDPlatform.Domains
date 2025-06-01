@@ -52,5 +52,20 @@ namespace MDDPlatform.DomainModels.Core.ValueObjects
         {
             yield return Value;
         }
+
+        public ModelAbstractions ToAbstractionLevel()
+        {
+            if(Value== "CIM")
+                return ModelAbstractions.CIM;
+            if(Value== "PIM")
+                return ModelAbstractions.PIM;
+            if(Value== "PSM")
+                return ModelAbstractions.PSM;
+            if(Value=="Code")
+                return ModelAbstractions.Code;
+
+            return ModelAbstractions.Undefined;
+
+        }
     }
 }

@@ -4,6 +4,8 @@
     <ProjectReference Include="..\MDDPlatform.Domains.Application\MDDPlatform.Domains.Application.csproj" />
     <ProjectReference Include="..\..\MDDPlatform.Messages\MDDPlatform.Messages.Broker\MDDPlatform.Messages.Broker.csproj" />
     <ProjectReference Include="..\..\MDDPlatform.DataStorage\MDDPlatform.DataStorage.SQLDB\MDDPlatform.DataStorage.SQLDB.csproj" />
+    <ProjectReference Include="..\..\MDDPlatform.DataStorage\MDDPlatform.DataStorage.MongoDB\MDDPlatform.DataStorage.MongoDB.csproj" />
+    <ProjectReference Include="..\..\MDDPlatform.Messages\MDDPlatform.Messages.Extensions\MDDPlatform.Messages.Extensions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

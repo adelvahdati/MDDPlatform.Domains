@@ -1,4 +1,3 @@
-using MDDPlatform.DomainModels.Core.Enums;
 using MDDPlatform.Domains.Application.DTO;
 
 namespace MDDPlatform.Domains.Application.Services
@@ -6,10 +5,17 @@ namespace MDDPlatform.Domains.Application.Services
     public interface IDomainService
     {
         Task CreateModelAsync(Guid domainId, NewModelDto newModel);
-        Task<ModelDto> FindModelAsync(Guid domainId, string name, string tag,ModelAbstractions abstraction,int level);
-        Task<DomainDto> GetDomainAsync(Guid domainId);
-        Task<IList<ModelDto>> GetAllModelsAsync(Guid domainId);
-        Task<IList<ModelDto>> GetModelsAtSpecificLevelAsync(Guid domainId,ModelAbstractions abstraction,int level);
-        Task<IList<ModelDto>> GetModelsByNameAsync(Guid domainId, string name,ModelAbstractions abstraction,int level);
+        Task DeleteModelAsync(Guid domainId,Guid modelId);
+        Task<DomainDto?> GetDomainAsync(Guid domainId);
+        Task<List<ModelDto>> GetDomainModelsAsync(Guid domainId);
+        Task<List<ModelDto>> GetProblemDomainModelsAsync(Guid problemdDomainId);
+        Task<ModelDto?> FindModelByIdAsync(Guid domainId, Guid modelId);
+        Task<DomainModelDto?> FindDomainModelByIdAsync(Guid modelId);
+        Task<List<DomainModelDto>?> FindDomainModelsByIdAsync(List<Guid> modelIds);
+
+        Task<List<ModelDto>> GetCIMAsync(Guid domainId,string? name =null,string? tag =null,int level = default);
+        Task<List<ModelDto>> GetPIMAsync(Guid domainId,string? name =null,string? tag =null,int level = default);
+        Task<List<ModelDto>> GetPSMAsync(Guid domainId,string? name =null,string? tag =null,int level = default);
+        Task<List<ModelDto>> GetCodeModelAsync(Guid domainId,string? name =null,string? tag =null,int level = default);
     }
 }

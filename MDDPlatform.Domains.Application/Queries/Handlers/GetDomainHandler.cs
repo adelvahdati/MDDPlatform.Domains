@@ -1,15 +1,16 @@
 using MDDPlatform.Domains.Application.DTO;
-using MDDPlatform.Domains.Application.Repository;
+using MDDPlatform.Domains.Services.Repositories;
 using MDDPlatform.Messages.Queries;
 
-namespace MDDPlatform.Domains.Application.Queries.Handlers{
-    public class GetDomainHandler : IQueryHandler<GetDomain, DomainDto>
+namespace MDDPlatform.Domains.Application.Queries.Handlers
+{
+    public class GetDomainHandler : IQueryHandler<GetDomain, DomainDto?>
     {
-        private readonly IDomainReader _domainReader;
+        private IDomainRepository _domainRepository;
 
-        public GetDomainHandler(IDomainReader domainReader)
+        public GetDomainHandler(IDomainRepository domainRepository)
         {
-            _domainReader = domainReader;
+            _domainRepository = domainRepository;
         }
 
         public DomainDto Handle(GetDomain query)
@@ -17,9 +18,13 @@ namespace MDDPlatform.Domains.Application.Queries.Handlers{
             throw new NotImplementedException();
         }
 
-        public async Task<DomainDto> HandleAsync(GetDomain query)
+        public async Task<DomainDto?> HandleAsync(GetDomain query)
         {
-            return await _domainReader.GetDomain(query.DomainId);
+            var domain =  await _domainRepository.GetAsync(query.DomainId);
+            if(Equals(domain,null))
+                return null;
+
+            return DomainDto.CreateFrom(domain);
         }
     }
 }

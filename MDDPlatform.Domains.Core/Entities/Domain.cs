@@ -15,10 +15,6 @@ namespace MDDPlatform.Domains.Core.Entities
         public ProblemDomain ProblemDomain { get; private set; }
         public IReadOnlyList<Model> Models => _models;
 
-        private Domain()
-        {
-
-        }
         private Domain(ProblemDomain problemDomain, Guid domainId, string name, List<Model>? domainModels = null)
         {
             ProblemDomain = problemDomain;
@@ -38,10 +34,17 @@ namespace MDDPlatform.Domains.Core.Entities
             domain.AddEvent(new DomainCreated(problemDomain.Id,domainId,name));
             return domain;
         }
-        public IActionStatus CreateModel(string name,string tag,ModelAbstractions abstraction,int level)
+        public static Domain Load(ProblemDomain problemDomain, Guid domainId, string name, List<Model>? domainModels = null){
+            if(string.IsNullOrEmpty(name))
+                throw new DomainNameNullException("Domain name should not be null");
+
+            return new Domain(problemDomain,domainId,name,domainModels);
+
+        }
+        public IActionStatus CreateModel(string name,string tag,ModelAbstractions abstraction,int level,Language language)
         {
             Model? model;
-            var action = Model.Create(name,tag,abstraction,level);
+            var action = Model.Create(name,tag,abstraction,level,language);
             if(action.Status == ActionStatus.Failure)
                 return TheAction.Failed(action.Message);
                                     
@@ -107,5 +110,10 @@ namespace MDDPlatform.Domains.Core.Entities
             }
         }
 
+        public void DeleteModel(Guid modelId)
+        {
+            _models.RemoveAll(model=> model.TraceId.Value == modelId);
+            AddEvent(new ModelRemoved(Id,modelId));            
+        }
     }
 }

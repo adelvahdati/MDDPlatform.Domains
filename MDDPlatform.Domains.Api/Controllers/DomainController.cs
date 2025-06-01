@@ -1,54 +1,68 @@
-using MDDPlatform.DomainModels.Core.Enums;
 using MDDPlatform.Domains.Application.DTO;
+using MDDPlatform.Domains.Application.Queries;
 using MDDPlatform.Domains.Application.Services;
+using MDDPlatform.Messages.Dispatchers;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MDDPlatform.Domains.Api.Controllers{
+namespace MDDPlatform.Domains.Api.Controllers
+{
 
     [ApiController]
     [Route("[controller]")]
     public class DomainController : ControllerBase{
         private readonly IDomainService _domainService;
-
-        public DomainController(IDomainService domainService)
+        private readonly IMessageDispatcher _messageDispatcher;
+        public DomainController(IDomainService domainService, IMessageDispatcher messageDispatcher)
         {
             _domainService = domainService;
+            _messageDispatcher = messageDispatcher;
         }
 
-        [HttpPost("{domainId}/Model/Create")]
+        [HttpPost("{domainId:guid}/Model/Create")]
         public async Task Create(Guid domainId, [FromBody] NewModelDto model){
-            Console.WriteLine($"{domainId} - {model.Name} - {model.Tag}");
             await _domainService.CreateModelAsync(domainId,model);            
         }
-
-        [HttpGet("{domainId}")]
-        public async Task<DomainDto> GetDomain(Guid domainId){
-            return await _domainService.GetDomainAsync(domainId);
+        [HttpDelete("{domainId:guid}/Model/{modelId:guid}")]
+        public async Task DeleteModel(Guid domainId,Guid modelId)
+        {
+            await _domainService.DeleteModelAsync(domainId,modelId);
         }
 
-        [HttpGet("{domainId}/Models")]
-        public async Task<IList<ModelDto>> GetModels(Guid domainId){
-            return await _domainService.GetAllModelsAsync(domainId);
+        [HttpGet("{domainId:guid}")]
+        public async Task<DomainDto?> GetDomain(Guid domainId){
+            var domain = await _domainService.GetDomainAsync(domainId);
+            return domain;
         }
 
-        [HttpGet("{domainId}/Models/{name}")]
-        public async Task<IList<ModelDto>> GetModels(Guid domainId,string name,ModelAbstractions abstraction=ModelAbstractions.Undefined,int level = 0){
-            return await _domainService.GetModelsByNameAsync(domainId,name,abstraction,level);
+        [HttpGet("{domainId:guid}/Models")]
+        public async Task<List<ModelDto>> GetDomainModels(Guid domainId){
+            return await _domainService.GetDomainModelsAsync(domainId);
         }
 
-        [HttpGet("{domainId}/Find/{name}/{tag}")]
-        public async Task<ModelDto> GetModelByNameTag(Guid domainId,string name,string tag,ModelAbstractions abstraction=ModelAbstractions.Undefined,int level = 0){
-            Console.WriteLine($"Find By name & tag : {domainId} - {name} - {tag}");
-
-            return await _domainService.FindModelAsync(domainId,name,tag,abstraction,level);
+        [HttpGet("{domainId:guid}/Model/{modelId}")]
+        public async Task<ModelDto?> FindModelById(Guid domainId,Guid modelId)
+        {
+            return await _domainService.FindModelByIdAsync(domainId,modelId);
         }
-        
-        [HttpGet("{domainId}/Find/{name}")]
-        public async Task<ModelDto> GetModelByName(Guid domainId,string name,ModelAbstractions abstraction=ModelAbstractions.Undefined,int level = 0){
-            Console.WriteLine($"Find By name : {domainId} - {name} ");
-            
-            return await _domainService.FindModelAsync(domainId,name,"",abstraction,level);
-            
+        [HttpGet("DomainModel/{modelId}")]
+        public async Task<DomainModelDto?> FindDomainModelById(Guid modelId)
+        {
+            return await _domainService.FindDomainModelByIdAsync(modelId);
+        }
+        [HttpPost("DomainModels")]
+        public async Task<List<DomainModelDto>?> FindDomainModels(FindDomainModelsById query)
+        {
+            return await _domainService.FindDomainModelsByIdAsync(query.ModelIds);
+        }
+        [HttpGet("ProblemDomainModels/{problemDomainId}")]
+        public async Task<List<ModelDto>> GetProblemDomainModels(Guid problemDomainId)
+        {
+            return await _domainService.GetProblemDomainModelsAsync(problemDomainId);
+        }
+        [HttpPost("Find")]
+        public async Task<List<ModelDto>> SearchInModels(FindModels query)
+        {
+            return await _messageDispatcher.HandleAsync<List<ModelDto>>(query);
         }
     }
 }

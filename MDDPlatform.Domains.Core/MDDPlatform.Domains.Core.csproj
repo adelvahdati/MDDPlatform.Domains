@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\MDDPlatform.SharedKernel\MDDPlatform.SharedKernel.csproj" />
+    <PackageReference Include="MDDPlatform.SharedKernel" Version="3.0.0" />
   </ItemGroup>
 
   <PropertyGroup>

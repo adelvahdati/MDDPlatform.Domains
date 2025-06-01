@@ -8,16 +8,17 @@ namespace MDDPlatform.Domains.Services.ExternalEvents.Handlers
 {
     public class ProblemDomainDecomposedHandler : IEventHandler<ProblemDomainDecomposed>
     {
-        private readonly IDomainWriter _domainWriter;
+        private readonly IDomainRepository _domainRepositoty;
         private readonly IMessageBroker _messageBroker;
         private readonly IEventMapper _eventMapper;
 
-        public ProblemDomainDecomposedHandler(IDomainWriter domainWriter,IMessageBroker messageBroker, IEventMapper eventMapper)
+        public ProblemDomainDecomposedHandler(IDomainRepository domainRepositoty, IMessageBroker messageBroker, IEventMapper eventMapper)
         {
-            _domainWriter = domainWriter;
+            _domainRepositoty = domainRepositoty;
             _messageBroker = messageBroker;
             _eventMapper = eventMapper;
         }
+
         public void Handle(ProblemDomainDecomposed @event)
         {
             throw new NotImplementedException();            
@@ -29,19 +30,15 @@ namespace MDDPlatform.Domains.Services.ExternalEvents.Handlers
             var problemDomainId = @event.ProblemDomainId;
             var domainId = @event.SubDomainId;
 
-            Console.WriteLine($"Inside ProblemDomainDecomposedHandler - Domain name : {domainName}, problemId {problemDomainId}");
 
             //Check for duplication of event
-            bool isDefined = await _domainWriter.IsDomainDefinedAsync(problemDomainId,domainName);
+            bool isDefined = await _domainRepositoty.IsDomainDefinedAsync(problemDomainId,domainName);
             if(isDefined)
-            {
-                Console.WriteLine("---> ProblemDomainDecomposedHandler : This domain is defined previously");
                 return;
-            }
             
             ProblemDomain problemDomain = new ProblemDomain(problemDomainId);            
             Domain domain = Domain.Create(problemDomain,domainId,domainName);
-            await _domainWriter.CreateAsync(domain);
+            await _domainRepositoty.CreateAsync(domain);
             
             await _messageBroker.PublishAsync(_eventMapper.Map(domain.DomainEvents.ToList()));
             domain.ClearEvents();

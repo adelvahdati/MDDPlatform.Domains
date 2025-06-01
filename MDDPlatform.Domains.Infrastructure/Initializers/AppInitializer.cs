@@ -1,44 +1,45 @@
-using MDDPlatform.Domains.Infrastructure.Data.Context;
 using MDDPlatform.Domains.Services.ExternalEvents;
 using MDDPlatform.Messages.Brokers;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
-namespace MDDPlatform.Domains.Infrastructure.Initializers{
+namespace MDDPlatform.Domains.Infrastructure.Initializers
+{
     public class AppInitializer : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
-
-        public AppInitializer(IServiceProvider serviceProvider)
+        private ILogger<AppInitializer> _logger;
+        public AppInitializer(IServiceProvider serviceProvider, ILogger<AppInitializer> logger)
         {
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
         public async Task StartAsync(CancellationToken cancellationToken)
         {
                 using var scope = _serviceProvider.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<ReadContext>();
-                try
-                {
-                    await context.Database.MigrateAsync(cancellationToken);
-                    Console.WriteLine("---> Database Migrated");
-                }catch(Exception ex){
-                    Console.WriteLine("---> Migration failed");
-                    Console.WriteLine(ex.Message);
-                }
                 try{
                     IMessageBroker messageBroker = scope.ServiceProvider.GetRequiredService<IMessageBroker>();                
+                    
                     await messageBroker.SubscribeAsync<ProblemDomainDecomposed>();
-                    Console.WriteLine("---> Subscribe to events");
-                }catch(Exception ex) {
-                    Console.WriteLine("---> Subscription failed");
-                    Console.WriteLine(ex.Message);
+                    _logger.LogInformation("Subscribe to 'ProblemDomainDecomposed' Event");
+
+                    await messageBroker.SubscribeAsync<ProblemDomainRemoved>();
+                    _logger.LogInformation("Subscribe to 'ProblemDomainRemoved' Event");
+
+                    await messageBroker.SubscribeAsync<SubDomainRemoved>();
+                    _logger.LogInformation("Subscribe to 'SubDomainRemoved' Event");
+
+                }catch(Exception ex) 
+                {
+                    _logger.LogInformation("Subscription to the Events failed");
+                    _logger.LogError(ex.Message);
                 }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Service Stoped");
+            Console.WriteLine("Domain Service Stoped");
             return Task.CompletedTask;
         }
     }

@@ -11,6 +11,7 @@ namespace MDDPlatform.Domains.Core.Events
         public string Tag {get;}
         public string Type {get;}
         public int Level {get;}
+        public Guid LanguageId {get;}
         internal ModelCreated(Guid domainId , Model model)
         {
             DomainId = domainId;
@@ -19,6 +20,7 @@ namespace MDDPlatform.Domains.Core.Events
             Tag = model.Tag;
             Type = model.Type.Value;
             Level = model.Level;
+            LanguageId = model.Language.Id;
         }
     }
 }
